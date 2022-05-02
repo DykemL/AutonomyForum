@@ -73,6 +73,7 @@ public class AuthService : IAuthService
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
         user.GenerateNewRefreshToken();
+        await userService.UpdateUserAsync(user);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),

@@ -1,5 +1,6 @@
 ﻿using AutonomyForum.Api.Types.Requests;
 using AutonomyForum.Extentions;
+using AutonomyForum.Helpers;
 using AutonomyForum.Services.Auth;
 using AutonomyForum.Services.Roles;
 using BankServer.Helpers;
@@ -18,7 +19,7 @@ public class AuthController : ControllerBase
         => this.authService = authService;
 
     [HttpPost]
-    public async Task<ActionResult<AuthInfo>> AuthAsync(AuthRequest authRequest)
+    public async Task<IActionResult> AuthAsync(AuthRequest authRequest)
     {
         var authInfo = await authService.AuthAsync(authRequest);
         if (authInfo == null)
@@ -27,7 +28,7 @@ public class AuthController : ControllerBase
         }
 
         Response.Cookies.SetJwtToken(authInfo);
-        return Ok(authInfo);
+        return Ok();
     }
 
     [Route("Register")]
@@ -55,8 +56,14 @@ public class AuthController : ControllerBase
 
     [Route("Refresh")]
     [HttpPost]
-    public async Task<ActionResult<AuthInfo>> RefreshAsync(string refreshToken)
+    public async Task<IActionResult> RefreshAsync()
     {
+        Request.Cookies.TryGetValue(CookieKeys.ApplicationRefreshToken, out var refreshToken);
+        if (refreshToken == null)
+        {
+            return Unauthorized();
+        }
+
         var authInfo = await authService.RefreshAsync(refreshToken);
         if (authInfo == null)
         {
@@ -64,6 +71,6 @@ public class AuthController : ControllerBase
         }
 
         Response.Cookies.SetJwtToken(authInfo);
-        return Ok(authInfo);
+        return Ok();
     }
 }

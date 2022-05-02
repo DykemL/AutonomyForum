@@ -71,18 +71,6 @@ public static class WebApplicationBuilderExtentions
         builder.Services.AddSwaggerGen();
         builder.Services.ConfigureSwaggerGen(options =>
         {
-            options.AddSecurityDefinition(AuthDefaults.AuthType, new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.ApiKey,
-                In = ParameterLocation.Header,
-                Name = AuthDefaults.AuthHeader
-            });
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new() { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = AuthDefaults.AuthType } }, new string[] { }
-                }
-            });
             options.DescribeAllParametersInCamelCase();
         });
     }
