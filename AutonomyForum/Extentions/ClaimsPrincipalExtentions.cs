@@ -8,4 +8,7 @@ public static class ClaimsPrincipalExtentions
 
     public static Guid GetId(this ClaimsPrincipal claimsPrincipal)
         => new(claimsPrincipal.Claims.Single(x => x.Type == IdKey).Value);
+
+    public static string GetName(this ClaimsPrincipal claimsPrincipal)
+        => new(claimsPrincipal.Claims.Single(x => x.Type == IdKey).Value);
 }

@@ -2,11 +2,11 @@
 
 namespace AutonomyForum.Middlewares;
 
-public class CookieJwtMiddleware
+public class JwtCookieMiddleware
 {
     private readonly RequestDelegate next;
 
-    public CookieJwtMiddleware(RequestDelegate next) =>
+    public JwtCookieMiddleware(RequestDelegate next) =>
         this.next = next;
 
     public async Task InvokeAsync(HttpContext context)

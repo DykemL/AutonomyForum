@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Api\Controllers\Topics" />
+    <Folder Include="Api\Types\Auth" />
+    <Folder Include="Api\Types\Sections" />
     <Folder Include="Migrations" />
   </ItemGroup>
 

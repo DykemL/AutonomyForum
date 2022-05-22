@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AutonomyForum.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220501215834_Initial")]
+    [Migration("20220502115233_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -115,6 +115,9 @@ namespace AutonomyForum.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("RefreshToken")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });

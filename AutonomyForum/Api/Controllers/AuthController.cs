@@ -1,4 +1,4 @@
-﻿using AutonomyForum.Api.Types.Requests;
+﻿using AutonomyForum.Api.Controllers.Auth;
 using AutonomyForum.Extentions;
 using AutonomyForum.Helpers;
 using AutonomyForum.Services.Auth;
@@ -18,10 +18,11 @@ public class AuthController : ControllerBase
     public AuthController(IAuthService authService)
         => this.authService = authService;
 
+    [Route("Login")]
     [HttpPost]
-    public async Task<IActionResult> AuthAsync(AuthRequest authRequest)
+    public async Task<IActionResult> LoginAsync(LoginRequest loginRequest)
     {
-        var authInfo = await authService.AuthAsync(authRequest);
+        var authInfo = await authService.LoginAsync(loginRequest);
         if (authInfo == null)
         {
             return Unauthorized();
@@ -33,22 +34,22 @@ public class AuthController : ControllerBase
 
     [Route("Register")]
     [HttpPost]
-    public async Task<IActionResult> RegisterAsync(RegisterRequest model)
+    public async Task<ActionResult<RegisterResponse>> RegisterAsync([FromBody] RegisterRequest model)
     {
-        var registerStatus = await authService.RegisterAsync(model, AppRoles.User);
+        var registerStatus = await authService.RegisterAsync(model, AppRoles.Admin);
         if (registerStatus == RegisterStatus.AlreadyExists)
         {
-            return BadRequest("Пользователь уже существует");
+            return BadRequest(new RegisterResponse { Message = "Пользователь уже существует" });
         }
 
         if (registerStatus == RegisterStatus.Error)
         {
-            return BadRequest("Не удалось зарегистрировать пользователя");
+            return BadRequest(new RegisterResponse { Message = "Не удалось зарегистрировать пользователя" });
         }
 
         if (registerStatus == RegisterStatus.Success)
         {
-            return Ok("Пользователь успешно зарегистрирован");
+            return Ok(new RegisterResponse { Message = "Пользователь успешно зарегистрирован" });
         }
 
         return BadRequest("Неизвестная ошибка");

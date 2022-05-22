@@ -188,6 +188,12 @@ namespace AutonomyForum.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_RefreshToken",
+                table: "AspNetUsers",
+                column: "RefreshToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",

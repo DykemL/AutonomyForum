@@ -1,4 +1,4 @@
-﻿using AutonomyForum.Api.Types.Requests;
+﻿using AutonomyForum.Api.Controllers.Auth;
 using AutonomyForum.Models.DbEntities;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,27 +17,27 @@ public class AuthService : IAuthService
         this.jwtSecurityService = jwtSecurityService;
     }
 
-    public async Task<AuthInfo?> AuthAsync(AuthRequest authRequest)
+    public async Task<AuthInfo?> LoginAsync(LoginRequest loginRequest)
     {
-        var user = await userManager.FindByNameAsync(authRequest.UserName);
+        var user = await userManager.FindByNameAsync(loginRequest.UserName);
         if (user == null)
         {
             return null;
         }
 
-        if (!await userManager.CheckPasswordAsync(user, authRequest.Password))
+        if (!await userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
             return null;
         }
 
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
-        user.GenerateNewRefreshToken();
+        user.RefreshToken = Guid.NewGuid().ToString();
         await userService.UpdateUserAsync(user);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),
-            RefreshToken = user.RefreshToken!,
+            RefreshToken = user.RefreshToken,
             Expiration = token.ValidTo
         };
     }
@@ -72,12 +72,12 @@ public class AuthService : IAuthService
 
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
-        user.GenerateNewRefreshToken();
+        user.RefreshToken = Guid.NewGuid().ToString();
         await userService.UpdateUserAsync(user);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),
-            RefreshToken = user.RefreshToken!,
+            RefreshToken = user.RefreshToken,
             Expiration = token.ValidTo
         };
     }

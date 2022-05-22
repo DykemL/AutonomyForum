@@ -1,4 +1,4 @@
-﻿namespace AutonomyForum.Api.Types.Requests;
+﻿namespace AutonomyForum.Api.Controllers.Auth;
 
 public class RegisterRequest
 {

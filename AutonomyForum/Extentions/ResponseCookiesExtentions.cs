@@ -12,11 +12,13 @@ public static class ResponseCookiesExtentions
         responseCookies.Append(CookieKeys.ApplicationJwt, authInfo.Token,
                                new CookieOptions
                                {
-                                   MaxAge = authInfo.Expiration - DateTime.UtcNow 
+                                   HttpOnly = false,
+                                   MaxAge = authInfo.Expiration - DateTime.UtcNow
                                });
-        responseCookies.Append(CookieKeys.ApplicationRefreshToken, authInfo.RefreshToken, new CookieOptions
-        {
-            MaxAge = refreshTokenTtl
-        });
+        responseCookies.Append(CookieKeys.ApplicationRefreshToken, authInfo.RefreshToken,
+                               new CookieOptions
+                               {
+                                   MaxAge = refreshTokenTtl
+                               });
     }
 }

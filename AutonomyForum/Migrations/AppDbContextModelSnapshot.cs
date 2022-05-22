@@ -114,6 +114,9 @@ namespace AutonomyForum.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("RefreshToken")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
