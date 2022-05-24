@@ -2,11 +2,11 @@
 
 namespace AutonomyForum.Models.DbEntities;
 
-public abstract class DbEntity
+public class DbEntity
 {
     [Key]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
-    protected DbEntity()
-        => Id = Guid.NewGuid();
+    public DbEntity()
+        => Id = new Guid();
 }

@@ -6,9 +6,9 @@ namespace AutonomyForum.Extentions;
 public static class WebApplicationExtentions
 {
     public static void ConfigureCors(this WebApplication app)
-        => app.UseCors(builder => builder.WithOrigins("http://localhost:3000")
+        => app.UseCors(builder => builder.WithOrigins("http://localhost:3000", "https://dykeml.github.io")
                                          .AllowAnyHeader()
-                                         .AllowAnyMethod()
+                                         .WithMethods("GET", "PUT", "PATCH", "POST", "DELETE", "OPTIONS", "HEAD")
                                          .AllowCredentials());
 
     public static void ConfigureCookies(this WebApplication app)

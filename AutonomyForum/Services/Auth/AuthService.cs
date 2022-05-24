@@ -1,5 +1,4 @@
-﻿using AutonomyForum.Api.Controllers.Auth;
-using AutonomyForum.Models.DbEntities;
+﻿using AutonomyForum.Models.DbEntities;
 using Microsoft.AspNetCore.Identity;
 
 namespace AutonomyForum.Services.Auth;
@@ -17,15 +16,15 @@ public class AuthService : IAuthService
         this.jwtSecurityService = jwtSecurityService;
     }
 
-    public async Task<AuthInfo?> LoginAsync(LoginRequest loginRequest)
+    public async Task<AuthInfo?> LoginAsync(string userName, string password)
     {
-        var user = await userManager.FindByNameAsync(loginRequest.UserName);
+        var user = await userManager.FindByNameAsync(userName);
         if (user == null)
         {
             return null;
         }
 
-        if (!await userManager.CheckPasswordAsync(user, loginRequest.Password))
+        if (!await userManager.CheckPasswordAsync(user, password))
         {
             return null;
         }
@@ -34,24 +33,26 @@ public class AuthService : IAuthService
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
         user.RefreshToken = Guid.NewGuid().ToString();
         await userService.UpdateUserAsync(user);
+        var userExtended = await userService.GetUserExtendedAsync(user.Id);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),
+            Expiration = token.ValidTo,
             RefreshToken = user.RefreshToken,
-            Expiration = token.ValidTo
+            UserExtended = userExtended!
         };
     }
 
-    public async Task<RegisterStatus> RegisterAsync(RegisterRequest registerRequest, params string[] roles)
+    public async Task<RegisterStatus> RegisterAsync(string userName, string email, string password, params string[] roles)
     {
-        var userExists = await userManager.FindByNameAsync(registerRequest.UserName);
+        var userExists = await userManager.FindByNameAsync(userName);
         if (userExists != null)
         {
             return RegisterStatus.AlreadyExists;
         }
 
-        var user = new User(registerRequest.UserName) { Email = registerRequest.Email };
-        var result = await userManager.CreateAsync(user, registerRequest.Password);
+        var user = new User(userName) { Email = email };
+        var result = await userManager.CreateAsync(user, password);
         if (!result.Succeeded)
         {
             return RegisterStatus.Error;
@@ -64,7 +65,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthInfo?> RefreshAsync(string refreshToken)
     {
-        var user = await userService.FindUserByRefreshToken(refreshToken);
+        var user = await userService.FindUserByRefreshTokenAsync(refreshToken);
         if (user == null)
         {
             return null;
@@ -74,11 +75,13 @@ public class AuthService : IAuthService
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
         user.RefreshToken = Guid.NewGuid().ToString();
         await userService.UpdateUserAsync(user);
+        var userExtended = await userService.GetUserExtendedAsync(user.Id);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),
+            Expiration = token.ValidTo,
             RefreshToken = user.RefreshToken,
-            Expiration = token.ValidTo
+            UserExtended = userExtended!
         };
     }
 }

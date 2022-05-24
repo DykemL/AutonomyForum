@@ -4,6 +4,8 @@ public static class Permissions
 {
     #region Common
     public const string Ban = "ban";
+    public const string SetModerator = "set-moderator";
+    public const string AllRestricted = "restricted";
     #endregion
 
     #region Section
@@ -14,6 +16,9 @@ public static class Permissions
 
     #region Topic
     public const string DeleteTopic = "delete-topic";
-    public const string DeleteTopicReply = "delete-topic-reply";
+    #endregion
+
+    #region Reply
+    public const string DeleteReply = "delete-reply";
     #endregion
 }

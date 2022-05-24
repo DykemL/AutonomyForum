@@ -19,10 +19,16 @@ public static class ContainerConfigurator
     }
 
     private static void ConfigureRepositories(IServiceCollection services)
-        => services.AddScoped<UsersRepository>();
+        => services.AddScoped<UsersRepository>()
+                   .AddScoped<SectionsRepository>()
+                   .AddScoped<TopicsRepository>()
+                   .AddScoped<RepliesRepository>();
 
     private static void ConfigureServices(IServiceCollection services)
         => services.AddScoped<IAuthService, AuthService>()
                    .AddScoped<UserService>()
-                   .AddScoped<IJwtSecurityService, JwtSecurityService>();
+                   .AddScoped<IJwtSecurityService, JwtSecurityService>()
+                   .AddScoped<SectionsService>()
+                   .AddScoped<TopicsService>()
+                   .AddScoped<RepliesService>();
 }

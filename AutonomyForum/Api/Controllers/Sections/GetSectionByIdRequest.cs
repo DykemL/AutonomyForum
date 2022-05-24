@@ -1,6 +1,6 @@
 ﻿namespace AutonomyForum.Api.Controllers.Sections;
 
-public class DeleteTopicRequest
+public class GetSectionByIdRequest
 {
     public Guid Id { get; set; }
 }

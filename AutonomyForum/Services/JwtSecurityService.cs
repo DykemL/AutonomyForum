@@ -8,7 +8,7 @@ namespace AutonomyForum.Services;
 
 public class JwtSecurityService : IJwtSecurityService
 {
-    private readonly TimeSpan jwtTtl = TimeSpan.FromMinutes(60); // Поменять на меньшее
+    private readonly TimeSpan jwtTtl = TimeSpan.FromMinutes(30);
 
     private readonly UserManager<User> userManager;
     private readonly AppSettings appSettings;

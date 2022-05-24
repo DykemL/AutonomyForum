@@ -22,6 +22,34 @@ namespace AutonomyForum.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Reply", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TopicId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Replies");
+                });
+
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -47,6 +75,63 @@ namespace AutonomyForum.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Section", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sections");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Topic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TitleMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("SectionId");
+
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.User", b =>
@@ -223,6 +308,59 @@ namespace AutonomyForum.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ReplyUser", b =>
+                {
+                    b.Property<Guid>("FavoredById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FavoredRepliesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("FavoredById", "FavoredRepliesId");
+
+                    b.HasIndex("FavoredRepliesId");
+
+                    b.ToTable("ReplyUser");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Reply", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.Topic", "Topic")
+                        .WithMany("Replies")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Topic", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.Section", "Section")
+                        .WithMany("Topics")
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Section");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("AutonomyForum.Models.DbEntities.Role", null)
@@ -272,6 +410,31 @@ namespace AutonomyForum.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ReplyUser", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", null)
+                        .WithMany()
+                        .HasForeignKey("FavoredById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.Reply", null)
+                        .WithMany()
+                        .HasForeignKey("FavoredRepliesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Section", b =>
+                {
+                    b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Topic", b =>
+                {
+                    b.Navigation("Replies");
                 });
 #pragma warning restore 612, 618
         }

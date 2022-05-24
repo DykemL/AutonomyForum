@@ -7,11 +7,9 @@ builder.ConfigureContainer();
 builder.ConfigureDatabase(settings);
 builder.ConfigureIdentity();
 builder.ConfigureJwt(settings);
-builder.ConfigureCors();
 builder.ConfigureSwagger();
 
 builder.Services.AddControllers();
-//builder.Services.AddCors();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,5 +25,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();

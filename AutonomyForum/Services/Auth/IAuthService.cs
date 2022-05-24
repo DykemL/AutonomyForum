@@ -1,10 +1,8 @@
-﻿using AutonomyForum.Api.Controllers.Auth;
-
-namespace AutonomyForum.Services.Auth;
+﻿namespace AutonomyForum.Services.Auth;
 
 public interface IAuthService
 {
-    Task<AuthInfo?> LoginAsync(LoginRequest loginRequest);
-    Task<RegisterStatus> RegisterAsync(RegisterRequest registerRequest, params string[] roles);
+    Task<AuthInfo?> LoginAsync(string userName, string password);
+    Task<RegisterStatus> RegisterAsync(string userName, string email, string password, params string[] roles);
     Task<AuthInfo?> RefreshAsync(string refreshToken);
 }
