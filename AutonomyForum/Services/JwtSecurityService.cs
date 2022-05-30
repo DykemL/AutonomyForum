@@ -10,13 +10,11 @@ public class JwtSecurityService : IJwtSecurityService
 {
     private readonly TimeSpan jwtTtl = TimeSpan.FromMinutes(30);
 
-    private readonly UserManager<User> userManager;
     private readonly AppSettings appSettings;
     private readonly JwtSecurityTokenHandler jwtSecurityTokenHandler;
 
     public JwtSecurityService(UserManager<User> userManager, AppSettings appSettings, JwtSecurityTokenHandler jwtSecurityTokenHandler)
     {
-        this.userManager = userManager;
         this.appSettings = appSettings;
         this.jwtSecurityTokenHandler = jwtSecurityTokenHandler;
     }

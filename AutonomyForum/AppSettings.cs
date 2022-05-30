@@ -4,6 +4,7 @@ namespace AutonomyForum;
 
 public class AppSettings
 {
+    public string? FrontDomain { get; set; }
     public string? DatabaseConnectionString { get; set; }
     public byte[] JwtSigningSecretKey => Encoding.UTF8.GetBytes(jwtSigningSecretKey!);
     public string? AdminPassword { get; set; }
@@ -14,7 +15,10 @@ public class AppSettings
 
     public static AppSettings CreateFrom(ConfigurationManager configuration)
     {
-        var databaseConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString") ??
+        var frontDomain = Environment.GetEnvironmentVariable("FrontDomain") ??
+                          configuration.GetValue<string>("FrontDomain");
+        var databaseConnectionString = Environment.GetEnvironmentVariable("RemoteDatabaseConnectionString") ??
+                                       Environment.GetEnvironmentVariable("DatabaseConnectionString") ??
                                        configuration.GetConnectionString("LocalDatabaseConnectionString");
         var jwtSigningSecretKey = Environment.GetEnvironmentVariable("JwtSigningSecretKey");
         var adminPassword = Environment.GetEnvironmentVariable("AdminPassword") ??
@@ -23,6 +27,7 @@ public class AppSettings
                             configuration.GetValue<string>("Moderator:Password");
         return new AppSettings
         {
+            FrontDomain = frontDomain,
             DatabaseConnectionString = databaseConnectionString,
             jwtSigningSecretKey = jwtSigningSecretKey ?? DefaultJwtSigningSecretKey,
             AdminPassword = adminPassword,
