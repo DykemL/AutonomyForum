@@ -65,12 +65,12 @@ public class AppDbInitializer : IDbInitializer
         var admin = await userManager.FindByNameAsync("admin");
         if (admin == null)
         {
-            await authService.RegisterAsync("admin", "admin@autonomyforum", appSettings.AdminPassword ?? DefaultPassword, AppRoles.Admin);
+            await authService.Register("admin", "admin@autonomyforum", appSettings.AdminPassword ?? DefaultPassword, AppRoles.Admin);
         }
         var moderator = await userManager.FindByNameAsync("moderator");
         if (moderator == null)
         {
-            await authService.RegisterAsync("moderator", "moderator@autonomyforum", appSettings.ModeratorPassword ?? DefaultPassword, AppRoles.Moderator);
+            await authService.Register("moderator", "moderator@autonomyforum", appSettings.ModeratorPassword ?? DefaultPassword, AppRoles.Moderator);
         }
     }
 

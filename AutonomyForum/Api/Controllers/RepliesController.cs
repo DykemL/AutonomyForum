@@ -1,10 +1,10 @@
 ﻿using AutonomyForum.Api.Authorization;
 using AutonomyForum.Api.Controllers.Replies;
 using AutonomyForum.Extentions;
+using AutonomyForum.Helpers;
 using AutonomyForum.Models.DbEntities.Types;
 using AutonomyForum.Services;
 using AutonomyForum.Services.Claims.Permissions;
-using BankServer.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +22,7 @@ public class RepliesController : ControllerBase
         => this.repliesService = repliesService;
 
     [HttpPut]
-    public async Task<ActionResult> CreateReplyAsync([FromBody] CreateReplyRequest request)
+    public async Task<ActionResult> CreateReply([FromBody] CreateReplyRequest request)
     {
         var wasCreated = await repliesService.TryCreateReply(request.TopicId, User.GetId(), request.Message);
         if (!wasCreated)
@@ -36,16 +36,16 @@ public class RepliesController : ControllerBase
     [HttpDelete]
     [RequirePermission(Permissions.DeleteReply)]
     [Route("{id}")]
-    public async Task<ActionResult> DeleteReplyAsync([FromRoute] Guid id)
+    public async Task<ActionResult> DeleteReply([FromRoute] Guid id)
     {
-        await repliesService.DeleteReplyAsync(id);
+        await repliesService.DeleteReply(id);
 
         return Ok();
     }
 
     [HttpPost]
     [Route("{id}/like")]
-    public async Task<ActionResult> DoLikeReplyAsync([FromRoute] Guid id)
+    public async Task<ActionResult> DoLikeReply([FromRoute] Guid id)
     {
         var wasLiked = await repliesService.DoLikeReply(id, User.GetId());
         if (!wasLiked)

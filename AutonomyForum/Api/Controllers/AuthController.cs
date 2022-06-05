@@ -6,7 +6,6 @@ using AutonomyForum.Services;
 using AutonomyForum.Services.Auth;
 using AutonomyForum.Services.Claims.Permissions;
 using AutonomyForum.Services.Roles;
-using BankServer.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutonomyForum.Api.Controllers;
@@ -27,9 +26,9 @@ public class AuthController : ControllerBase
 
     [Route("login")]
     [HttpPost]
-    public async Task<ActionResult<UserExtended>> LoginAsync(LoginRequest request)
+    public async Task<ActionResult<UserExtended>> Login(LoginRequest request)
     {
-        var authInfo = await authService.LoginAsync(request.UserName, request.Password);
+        var authInfo = await authService.Login(request.UserName, request.Password);
         if (authInfo == null)
         {
             return Unauthorized();
@@ -46,9 +45,9 @@ public class AuthController : ControllerBase
 
     [Route("register")]
     [HttpPost]
-    public async Task<ActionResult<RegisterResponse>> RegisterAsync([FromBody] RegisterRequest request)
+    public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest request)
     {
-        var registerStatus = await authService.RegisterAsync(request.UserName, request.Email, request.Password, AppRoles.User);
+        var registerStatus = await authService.Register(request.UserName, request.Email, request.Password, AppRoles.User);
         if (registerStatus == RegisterStatus.AlreadyExists)
         {
             return BadRequest(new RegisterResponse { Message = "Пользователь уже существует" });
@@ -69,7 +68,7 @@ public class AuthController : ControllerBase
 
     [Route("refresh")]
     [HttpPost]
-    public async Task<ActionResult<UserExtended>> RefreshAsync()
+    public async Task<ActionResult<UserExtended>> Refresh()
     {
         Request.Cookies.TryGetValue(CookieKeys.ApplicationRefreshToken, out var refreshToken);
         if (refreshToken == null)
@@ -77,7 +76,7 @@ public class AuthController : ControllerBase
             return Unauthorized();
         }
 
-        var authInfo = await authService.RefreshAsync(refreshToken);
+        var authInfo = await authService.Refresh(refreshToken);
         if (authInfo == null || authInfo.UserExtended.Permissions.Contains(Permissions.AllRestricted))
         {
             return Unauthorized();
@@ -89,9 +88,9 @@ public class AuthController : ControllerBase
 
     [Route("current")]
     [HttpGet]
-    public async Task<ActionResult<UserExtended>> GetCurrentAsync()
+    public async Task<ActionResult<UserExtended>> GetCurrent()
     {
-        var user = await userService.GetUserExtendedAsync(User.GetId());
+        var user = await userService.GetUserExtended(User.GetId());
         if (user == null || user.Permissions.Contains(Permissions.AllRestricted))
         {
             return Unauthorized();

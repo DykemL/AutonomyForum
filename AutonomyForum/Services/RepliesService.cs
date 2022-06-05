@@ -10,10 +10,10 @@ public class RepliesService
         => this.repliesRepository = repliesRepository;
 
     public async Task<bool> TryCreateReply(Guid parentTopicId, Guid authorId, string message)
-        => await repliesRepository.TryCreateReplyAsync(parentTopicId, authorId, message);
+        => await repliesRepository.TryCreateReply(parentTopicId, authorId, message);
 
-    public async Task DeleteReplyAsync(Guid replyId)
-        => await repliesRepository.DeleteReplyAsync(replyId);
+    public async Task DeleteReply(Guid replyId)
+        => await repliesRepository.DeleteReply(replyId);
 
     public async Task<bool> DoLikeReply(Guid replyId, Guid userId)
         => await repliesRepository.DoLikeReply(replyId, userId);

@@ -12,7 +12,7 @@ public class TopicInfo
     public TopicInfo(Topic topic)
     {
         Id = topic.Id;
-        Author = topic.Author != null ? new UserInfo(topic.Author) : null;
+        Author = topic.Author != null ? new UserInfo(topic.Author, topic.Author.AvatarFile?.Path) : null;
         Title = topic.Title;
         TitleMessage = topic.TitleMessage;
         Replies = topic.Replies?.Select(x => new ReplyInfo(x)).ToArray();

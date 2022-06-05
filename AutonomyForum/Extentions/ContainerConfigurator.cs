@@ -22,7 +22,8 @@ public static class ContainerConfigurator
         => services.AddScoped<UsersRepository>()
                    .AddScoped<SectionsRepository>()
                    .AddScoped<TopicsRepository>()
-                   .AddScoped<RepliesRepository>();
+                   .AddScoped<RepliesRepository>()
+                   .AddScoped<FilesRepository>();
 
     private static void ConfigureServices(IServiceCollection services)
         => services.AddScoped<IAuthService, AuthService>()
@@ -30,5 +31,6 @@ public static class ContainerConfigurator
                    .AddScoped<IJwtSecurityService, JwtSecurityService>()
                    .AddScoped<SectionsService>()
                    .AddScoped<TopicsService>()
-                   .AddScoped<RepliesService>();
+                   .AddScoped<RepliesService>()
+                   .AddScoped<FilesService>();
 }

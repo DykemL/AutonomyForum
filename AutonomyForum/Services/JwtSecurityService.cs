@@ -13,7 +13,7 @@ public class JwtSecurityService : IJwtSecurityService
     private readonly AppSettings appSettings;
     private readonly JwtSecurityTokenHandler jwtSecurityTokenHandler;
 
-    public JwtSecurityService(UserManager<User> userManager, AppSettings appSettings, JwtSecurityTokenHandler jwtSecurityTokenHandler)
+    public JwtSecurityService(AppSettings appSettings, JwtSecurityTokenHandler jwtSecurityTokenHandler)
     {
         this.appSettings = appSettings;
         this.jwtSecurityTokenHandler = jwtSecurityTokenHandler;

@@ -1,10 +1,10 @@
 ﻿using AutonomyForum.Api.Authorization;
 using AutonomyForum.Api.Controllers.Topics;
 using AutonomyForum.Extentions;
+using AutonomyForum.Helpers;
 using AutonomyForum.Models.DbEntities.Types;
 using AutonomyForum.Services;
 using AutonomyForum.Services.Claims.Permissions;
-using BankServer.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,9 +22,9 @@ public class TopicsController : ControllerBase
         => this.topicsService = topicsService;
 
     [HttpPut]
-    public async Task<ActionResult> CreateTopicAsync([FromBody] CreateTopicRequest request)
+    public async Task<ActionResult> CreateTopic([FromBody] CreateTopicRequest request)
     {
-        if (await topicsService.TryCreateTopicAsync(request.Title, request.TitleMessage, User.GetId(), request.SectionId))
+        if (await topicsService.TryCreateTopic(request.Title, request.TitleMessage, User.GetId(), request.SectionId))
         {
             return Ok();
         }
@@ -35,9 +35,9 @@ public class TopicsController : ControllerBase
     [HttpGet]
     [Route("{id}")]
     [AllowAnonymous]
-    public async Task<ActionResult<TopicInfo>> FindTopicByIdAsync([FromRoute] FindTopicByIdRequest request)
+    public async Task<ActionResult<TopicInfo>> FindTopicById([FromRoute] FindTopicByIdRequest request)
     {
-        var topicInfo = await topicsService.FindTopicAsync(request.Id);
+        var topicInfo = await topicsService.FindTopic(request.Id);
         if (topicInfo == null)
         {
             return NotFound();
@@ -49,9 +49,9 @@ public class TopicsController : ControllerBase
     [HttpDelete]
     [RequirePermission(Permissions.DeleteTopic)]
     [Route("{id}")]
-    public async Task<ActionResult> DeleteTopicAsync([FromRoute] Guid id)
+    public async Task<ActionResult> DeleteTopic([FromRoute] Guid id)
     {
-        await topicsService.DeleteTopicAsync(id);
+        await topicsService.DeleteTopic(id);
 
         return Ok();
     }

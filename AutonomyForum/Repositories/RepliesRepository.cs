@@ -18,7 +18,7 @@ public class RepliesRepository
         replies = appDbContext.Set<Reply>();
     }
 
-    public async Task<bool> TryCreateReplyAsync(Guid parentTopicId, Guid authorId, string message)
+    public async Task<bool> TryCreateReply(Guid parentTopicId, Guid authorId, string message)
     {
         var reply = new Reply()
         {
@@ -40,7 +40,7 @@ public class RepliesRepository
         => await replies.Include(x => x.FavoredBy)
                         .FirstOrDefaultAsync(x => x.Id == replyId);
 
-    public async Task DeleteReplyAsync(Guid replyId)
+    public async Task DeleteReply(Guid replyId)
     {
         var reply = new Reply() { Id = replyId };
         appDbContext.Replies.Attach(reply);
@@ -50,7 +50,7 @@ public class RepliesRepository
 
     public async Task<bool> DoLikeReply(Guid replyId, Guid userId)
     {
-        var user = await usersRepository.FindUserByIdAsync(userId);
+        var user = await usersRepository.FindUserById(userId);
         var reply = await FindReply(replyId);
         if (user == null || reply == null || user.FavoredReplies.Any(x => x.Id == replyId) || reply.AuthorId == userId)
         {

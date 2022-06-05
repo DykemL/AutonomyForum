@@ -1,8 +1,8 @@
 ﻿using AutonomyForum.Api.Controllers.Users;
 using AutonomyForum.Extentions;
+using AutonomyForum.Helpers;
 using AutonomyForum.Models.DbEntities.Types;
 using AutonomyForum.Services;
-using BankServer.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,13 +24,27 @@ public class UsersController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult<UserExtended>> GetUserExtended([FromRoute] GetUserInfoRequest request)
     {
-        var userExtended = await userService.GetUserExtendedAsync(request.Id);
+        var userExtended = await userService.GetUserExtended(request.Id);
         if (userExtended == null)
         {
             return NotFound();
         }
 
         return Ok(userExtended);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("is-exists/{userName}")]
+    public async Task<ActionResult<bool>> IsUserNameExists([FromRoute] string userName)
+    {
+        var user = await userService.FindUserByUserName(userName);
+        if (user == null)
+        {
+            return Ok(false);
+        }
+
+        return Ok(true);
     }
 
     [HttpPost]
@@ -71,5 +85,17 @@ public class UsersController : ControllerBase
             ModifyUserRoleStatus.Success => Ok(),
             _ => BadRequest("Неизвестная ошибка при удалении роли")
         };
+    }
+
+    [HttpPost]
+    [Route("attach-avatar")]
+    public async Task<ActionResult> AttachAvatarToUser([FromBody] Guid fileId)
+    {
+        if (!await userService.TryAttachAvatarToUser(User.GetId(), fileId))
+        {
+            return BadRequest();
+        }
+
+        return Ok();
     }
 }

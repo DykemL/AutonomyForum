@@ -26,7 +26,7 @@ public class RequirePermissionAttribute : Attribute, IAsyncAuthorizationFilter
 
         var userService = context.HttpContext.RequestServices.GetService<UserService>()!;
 
-        var userClaims = await userService.GetPermissionClaimsAsync(userName!);
+        var userClaims = await userService.GetPermissionClaims(userName!);
         var permissionClaims = userClaims.Where(x => x.Type == ClaimTypes.Permission)
                                          .Select(x => x.Value)
                                          .ToHashSet();

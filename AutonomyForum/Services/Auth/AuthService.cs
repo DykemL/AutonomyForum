@@ -16,7 +16,7 @@ public class AuthService : IAuthService
         this.jwtSecurityService = jwtSecurityService;
     }
 
-    public async Task<AuthInfo?> LoginAsync(string userName, string password)
+    public async Task<AuthInfo?> Login(string userName, string password)
     {
         var user = await userManager.FindByNameAsync(userName);
         if (user == null)
@@ -32,8 +32,8 @@ public class AuthService : IAuthService
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
         user.RefreshToken = Guid.NewGuid().ToString();
-        await userService.UpdateUserAsync(user);
-        var userExtended = await userService.GetUserExtendedAsync(user.Id);
+        await userService.UpdateUser(user);
+        var userExtended = await userService.GetUserExtended(user.Id);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),
@@ -43,7 +43,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<RegisterStatus> RegisterAsync(string userName, string email, string password, params string[] roles)
+    public async Task<RegisterStatus> Register(string userName, string email, string password, params string[] roles)
     {
         var userExists = await userManager.FindByNameAsync(userName);
         if (userExists != null)
@@ -63,9 +63,9 @@ public class AuthService : IAuthService
         return RegisterStatus.Success;
     }
 
-    public async Task<AuthInfo?> RefreshAsync(string refreshToken)
+    public async Task<AuthInfo?> Refresh(string refreshToken)
     {
-        var user = await userService.FindUserByRefreshTokenAsync(refreshToken);
+        var user = await userService.FindUserByRefreshToken(refreshToken);
         if (user == null)
         {
             return null;
@@ -74,8 +74,8 @@ public class AuthService : IAuthService
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtSecurityService.CreateToken(user, roles.ToArray());
         user.RefreshToken = Guid.NewGuid().ToString();
-        await userService.UpdateUserAsync(user);
-        var userExtended = await userService.GetUserExtendedAsync(user.Id);
+        await userService.UpdateUser(user);
+        var userExtended = await userService.GetUserExtended(user.Id);
         return new AuthInfo
         {
             Token = jwtSecurityService.SerializeToken(token),

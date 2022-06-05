@@ -18,10 +18,10 @@ public class TopicsRepository
         this.sectionsRepository = sectionsRepository;
     }
 
-    public async Task<bool> TryCreateTopicAsync(string title, string titleMessage, Guid authorId, Guid parentSectionId)
+    public async Task<bool> TryCreateTopic(string title, string titleMessage, Guid authorId, Guid parentSectionId)
     {
-        var parentSection = await sectionsRepository.FindSectionAsync(parentSectionId);
-        var user = await userService.FindUserByIdAsync(authorId);
+        var parentSection = await sectionsRepository.FindSection(parentSectionId);
+        var user = await userService.FindUserById(authorId);
         if (parentSection == null || user == null)
         {
             return false;
@@ -34,12 +34,13 @@ public class TopicsRepository
         return true;
     }
 
-    public async Task<Topic?> FindTopicAsync(Guid id)
+    public async Task<Topic?> FindTopic(Guid id)
     {
         var topic = await appDbContext.Topics.Where(x => x.Id == id)
                                       .Include(x => x.Author)
                                       .Include(x => x.Replies)
                                       .ThenInclude(x => x.Author)
+                                      .ThenInclude(x => x.AvatarFile)
                                       .Include(x => x.Replies!.OrderBy(y => y.CreationDateTime))!
                                       .ThenInclude(x => x.FavoredBy)
                                       .FirstOrDefaultAsync();
@@ -55,7 +56,7 @@ public class TopicsRepository
         return topic;
     }
 
-    public async Task DeleteTopicAsync(Guid id)
+    public async Task DeleteTopic(Guid id)
     {
         var topic = new Topic() { Id = id };
         appDbContext.Topics.Attach(topic);

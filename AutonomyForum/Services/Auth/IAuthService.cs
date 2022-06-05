@@ -2,7 +2,7 @@
 
 public interface IAuthService
 {
-    Task<AuthInfo?> LoginAsync(string userName, string password);
-    Task<RegisterStatus> RegisterAsync(string userName, string email, string password, params string[] roles);
-    Task<AuthInfo?> RefreshAsync(string refreshToken);
+    Task<AuthInfo?> Login(string userName, string password);
+    Task<RegisterStatus> Register(string userName, string email, string password, params string[] roles);
+    Task<AuthInfo?> Refresh(string refreshToken);
 }

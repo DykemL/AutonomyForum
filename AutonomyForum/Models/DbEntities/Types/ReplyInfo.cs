@@ -12,7 +12,7 @@ public class ReplyInfo
     public ReplyInfo(Reply reply)
     {
         Id = reply.Id;
-        Author = reply.Author != null ? new UserInfo(reply.Author) : null;
+        Author = reply.Author != null ? new UserInfo(reply.Author, reply.Author.AvatarFile?.Path) : null;
         Topic = reply.Topic != null ? new TopicInfo(reply.Topic) : null;
         Message = reply.Message;
         FavoredBy = reply.FavoredBy != null ? reply.FavoredBy.Select(x => x.Id).ToArray() : null;

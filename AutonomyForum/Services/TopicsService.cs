@@ -10,12 +10,12 @@ public class TopicsService
     public TopicsService(TopicsRepository topicsRepository)
         => this.topicsRepository = topicsRepository;
 
-    public async Task<bool> TryCreateTopicAsync(string title, string titleMessage, Guid authorId, Guid parentSectionId)
-        => await topicsRepository.TryCreateTopicAsync(title, titleMessage, authorId, parentSectionId);
+    public async Task<bool> TryCreateTopic(string title, string titleMessage, Guid authorId, Guid parentSectionId)
+        => await topicsRepository.TryCreateTopic(title, titleMessage, authorId, parentSectionId);
 
-    public async Task<TopicInfo?> FindTopicAsync(Guid id)
+    public async Task<TopicInfo?> FindTopic(Guid id)
     {
-        var topic = await topicsRepository.FindTopicAsync(id);
+        var topic = await topicsRepository.FindTopic(id);
 
         if (topic == null)
         {
@@ -25,6 +25,6 @@ public class TopicsService
         return new TopicInfo(topic);
     }
 
-    public async Task DeleteTopicAsync(Guid id)
-        => await topicsRepository.DeleteTopicAsync(id);
+    public async Task DeleteTopic(Guid id)
+        => await topicsRepository.DeleteTopic(id);
 }

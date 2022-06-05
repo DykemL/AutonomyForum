@@ -21,21 +21,21 @@ public class UserService
         this.roleManager = roleManager;
     }
 
-    public async Task UpdateUserAsync(User user)
-        => await usersRepository.UpdateUserAsync(user);
+    public async Task UpdateUser(User user)
+        => await usersRepository.UpdateUser(user);
 
-    public async Task<User?> FindUserByIdAsync(Guid id)
-        => await usersRepository.FindUserByIdAsync(id);
+    public async Task<User?> FindUserById(Guid id)
+        => await usersRepository.FindUserById(id);
 
-    public async Task<User?> FindUserByUserNameAsync(string userName)
+    public async Task<User?> FindUserByUserName(string userName)
         => await userManager.FindByNameAsync(userName);
 
-    public async Task<User?> FindUserByRefreshTokenAsync(string refreshToken)
-        => await usersRepository.FindUserByRefreshTokenAsync(refreshToken);
+    public async Task<User?> FindUserByRefreshToken(string refreshToken)
+        => await usersRepository.FindUserByRefreshToken(refreshToken);
 
-    public async Task<UserExtended?> GetUserExtendedAsync(Guid userId)
+    public async Task<UserExtended?> GetUserExtended(Guid userId)
     {
-        var existingUser = await FindUserByIdAsync(userId);
+        var existingUser = await FindUserById(userId);
         if (existingUser == null)
         {
             return null;
@@ -46,16 +46,17 @@ public class UserService
             Id = existingUser.Id,
             UserName = existingUser.UserName,
             Email = existingUser.Email,
-            Roles = await GetUserRoles(userId)
+            Roles = await GetUserRoles(userId),
+            AvatarFilePath = existingUser.AvatarFile?.Path
         };
-        user.Permissions = await GetClearedPermissionsAsync(user.UserName);
+        user.Permissions = await GetClearedPermissions(user.UserName);
 
         return user;
     }
 
     public async Task<string[]> GetUserRoles(Guid userId)
     {
-        var user = await FindUserByIdAsync(userId);
+        var user = await FindUserById(userId);
         if (user == null)
         {
             return new string[] {};
@@ -65,15 +66,15 @@ public class UserService
         return roles.ToArray();
     }
 
-    public async Task<string[]> GetClearedPermissionsAsync(string userName)
+    public async Task<string[]> GetClearedPermissions(string userName)
     {
-        var claims = await GetPermissionClaimsAsync(userName);
+        var claims = await GetPermissionClaims(userName);
         return claims.Select(x => x.Value.Replace(PermissionPrefixes.Base + ":", string.Empty)).ToArray();
     }
 
-    public async Task<Claim[]> GetPermissionClaimsAsync(string userName)
+    public async Task<Claim[]> GetPermissionClaims(string userName)
     {
-        var user = await FindUserByUserNameAsync(userName);
+        var user = await FindUserByUserName(userName);
         if (user == null)
         {
             return new Claim[] {};
@@ -92,10 +93,13 @@ public class UserService
         return userClaims.Concat(roleClaims).ToArray();
     }
 
+    public async Task<bool> TryAttachAvatarToUser(Guid userId, Guid fileId)
+        => await usersRepository.TryAttachAvatarToUser(userId, fileId);
+
     public async Task<ModifyUserRoleStatus> AddRoleToUser(Guid currentUserId, Guid userId, string role)
     {
-        var currentUser = await GetUserExtendedAsync(currentUserId);
-        var user = await GetUserExtendedAsync(userId);
+        var currentUser = await GetUserExtended(currentUserId);
+        var user = await GetUserExtended(userId);
         if (user == null || currentUser == null)
         {
             return ModifyUserRoleStatus.UserIsNotExists;
@@ -115,8 +119,8 @@ public class UserService
 
     public async Task<ModifyUserRoleStatus> RemoveRoleFromUser(Guid currentUserId, Guid userId, string role)
     {
-        var currentUser = await GetUserExtendedAsync(currentUserId);
-        var user = await GetUserExtendedAsync(userId);
+        var currentUser = await GetUserExtended(currentUserId);
+        var user = await GetUserExtended(userId);
         if (user == null || currentUser == null)
         {
             return ModifyUserRoleStatus.UserIsNotExists;

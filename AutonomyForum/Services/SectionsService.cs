@@ -10,16 +10,16 @@ public class SectionsService
     public SectionsService(SectionsRepository sectionsRepository)
         => this.sectionsRepository = sectionsRepository;
 
-    public async Task<SectionInfo[]> GetSectionsAsync()
+    public async Task<SectionInfo[]> GetSections()
     {
-        var sections = await sectionsRepository.GetSectionsAsync();
+        var sections = await sectionsRepository.GetSections();
 
         return sections.Select(x => new SectionInfo(x)).ToArray();
     }
 
-    public async Task<SectionInfo?> FindSectionAsync(Guid id)
+    public async Task<SectionInfo?> FindSection(Guid id)
     {
-        var section = await sectionsRepository.FindSectionAsync(id);
+        var section = await sectionsRepository.FindSection(id);
         if (section == null)
         {
             return null;
@@ -28,9 +28,9 @@ public class SectionsService
         return new SectionInfo(section);
     }
 
-    public async Task CreateSectionAsync(string title, string description)
-        => await sectionsRepository.CreateSectionAsync(title, description);
+    public async Task CreateSection(string title, string description)
+        => await sectionsRepository.CreateSection(title, description);
 
-    public async Task DeleteSectionAsync(Guid id)
-        => await sectionsRepository.DeleteSectionAsync(id);
+    public async Task DeleteSection(Guid id)
+        => await sectionsRepository.DeleteSection(id);
 }

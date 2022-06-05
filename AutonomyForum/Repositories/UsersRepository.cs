@@ -1,5 +1,6 @@
 ﻿using AutonomyForum.Models;
 using AutonomyForum.Models.DbEntities;
+using AutonomyForum.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,27 +11,44 @@ public class UsersRepository
     private readonly AppDbContext appDbContext;
     private readonly UserManager<User> userManager;
     private readonly RoleManager<Role> roleManager;
+    private readonly FilesService filesService;
 
-    public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager, RoleManager<Role> roleManager)
+    public UsersRepository(AppDbContext appDbContext, UserManager<User> userManager, RoleManager<Role> roleManager, FilesService filesService)
     {
         this.appDbContext = appDbContext;
         this.userManager = userManager;
         this.roleManager = roleManager;
+        this.filesService = filesService;
     }
 
-    public async Task UpdateUserAsync(User user)
+    public async Task UpdateUser(User user)
     {
         appDbContext.Users.Update(user);
         await appDbContext.SaveChangesAsync();
     }
 
-    public async Task<User?> FindUserByIdAsync(Guid id)
+    public async Task<User?> FindUserById(Guid id)
         => await appDbContext.Users.Where(x => x.Id == id)
                              .Include(x => x.FavoredReplies)
+                             .Include(x => x.AvatarFile)
                              .FirstOrDefaultAsync();
 
-    public async Task<User?> FindUserByRefreshTokenAsync(string refreshToken)
+    public async Task<User?> FindUserByRefreshToken(string refreshToken)
         => await appDbContext.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+
+    public async Task<bool> TryAttachAvatarToUser(Guid userId, Guid fileId)
+    {
+        var file = await filesService.GetFile(fileId);
+        var user = await FindUserById(userId);
+        if (file == null || user == null)
+        {
+            return false;
+        }
+        user.AvatarFile = file;
+        await UpdateUser(user);
+
+        return true;
+    }
 
     public async Task<bool> AddRoleToUser(Guid userId, string userRole)
     {
@@ -38,7 +56,7 @@ public class UsersRepository
         {
             return false;
         }
-        var user = await FindUserByIdAsync(userId);
+        var user = await FindUserById(userId);
         if (user == null)
         {
             return false;
@@ -54,7 +72,7 @@ public class UsersRepository
         {
             return false;
         }
-        var user = await FindUserByIdAsync(userId);
+        var user = await FindUserById(userId);
         if (user == null)
         {
             return false;

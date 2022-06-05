@@ -1,9 +1,9 @@
 ﻿using AutonomyForum.Api.Authorization;
 using AutonomyForum.Api.Controllers.Sections;
+using AutonomyForum.Helpers;
 using AutonomyForum.Models.DbEntities.Types;
 using AutonomyForum.Services;
 using AutonomyForum.Services.Claims.Permissions;
-using BankServer.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,35 +22,35 @@ public class SectionsController : ControllerBase
 
     [HttpPut]
     [RequirePermission(Permissions.CreateSection)]
-    public async Task<ActionResult> CreateSectionAsync([FromBody] CreateSectionRequest request)
+    public async Task<ActionResult> CreateSection([FromBody] CreateSectionRequest request)
     {
-        await sectionsService.CreateSectionAsync(request.Title, request.Description);
+        await sectionsService.CreateSection(request.Title, request.Description);
         return Ok();
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<SectionInfo[]>> GetSectionsAsync()
+    public async Task<ActionResult<SectionInfo[]>> GetSections()
     {
-        var sectionInfos = await sectionsService.GetSectionsAsync();
+        var sectionInfos = await sectionsService.GetSections();
         return Ok(sectionInfos);
     }
 
     [HttpGet]
     [AllowAnonymous]
     [Route("{id}")]
-    public async Task<ActionResult<SectionInfo>> GetSectionByIdAsync([FromRoute] GetSectionByIdRequest request)
+    public async Task<ActionResult<SectionInfo>> GetSectionById([FromRoute] GetSectionByIdRequest request)
     {
-        var section = await sectionsService.FindSectionAsync(request.Id);
+        var section = await sectionsService.FindSection(request.Id);
         return Ok(section);
     }
 
     [HttpDelete]
     [RequirePermission(Permissions.DeleteSection)]
     [Route("{id}")]
-    public async Task<ActionResult> DeleteSectionAsync([FromRoute] DeleteSectionRequest request)
+    public async Task<ActionResult> DeleteSection([FromRoute] DeleteSectionRequest request)
     {
-        await sectionsService.DeleteSectionAsync(request.Id);
+        await sectionsService.DeleteSection(request.Id);
         return Ok();
     }
 }
