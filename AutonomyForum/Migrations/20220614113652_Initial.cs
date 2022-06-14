@@ -25,44 +25,31 @@ namespace AutonomyForum.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
+                name: "Elections",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RefreshToken = table.Column<string>(type: "text", nullable: true),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                    SectionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    LastStatusModifiedDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CurrentRoundNumber = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.PrimaryKey("PK_Elections", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sections",
+                name: "Files",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    CreationDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sections", x => x.Id);
+                    table.PrimaryKey("PK_Files", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -84,6 +71,46 @@ namespace AutonomyForum.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RepliesCount = table.Column<int>(type: "integer", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    ElectionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    AvatarFileId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Elections_ElectionId",
+                        column: x => x.ElectionId,
+                        principalTable: "Elections",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Files_AvatarFileId",
+                        column: x => x.AvatarFileId,
+                        principalTable: "Files",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -167,6 +194,93 @@ namespace AutonomyForum.Migrations
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PrivateMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SenderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReceiverId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: false),
+                    CreationDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrivateMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrivateMessages_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PrivateMessages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sections",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    PrefectId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ElectionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreationDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sections_AspNetUsers_PrefectId",
+                        column: x => x.PrefectId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Sections_Elections_ElectionId",
+                        column: x => x.ElectionId,
+                        principalTable: "Elections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Votes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ElectionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CandidateId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ElectorId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Votes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Votes_AspNetUsers_CandidateId",
+                        column: x => x.CandidateId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Votes_AspNetUsers_ElectorId",
+                        column: x => x.ElectorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Votes_Elections_ElectionId",
+                        column: x => x.ElectionId,
+                        principalTable: "Elections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -282,6 +396,16 @@ namespace AutonomyForum.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_AvatarFileId",
+                table: "AspNetUsers",
+                column: "AvatarFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ElectionId",
+                table: "AspNetUsers",
+                column: "ElectionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_RefreshToken",
                 table: "AspNetUsers",
                 column: "RefreshToken",
@@ -292,6 +416,16 @@ namespace AutonomyForum.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrivateMessages_ReceiverId",
+                table: "PrivateMessages",
+                column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrivateMessages_SenderId",
+                table: "PrivateMessages",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Replies_AuthorId",
@@ -309,6 +443,17 @@ namespace AutonomyForum.Migrations
                 column: "FavoredRepliesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Sections_ElectionId",
+                table: "Sections",
+                column: "ElectionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sections_PrefectId",
+                table: "Sections",
+                column: "PrefectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Topics_AuthorId",
                 table: "Topics",
                 column: "AuthorId");
@@ -317,6 +462,21 @@ namespace AutonomyForum.Migrations
                 name: "IX_Topics_SectionId",
                 table: "Topics",
                 column: "SectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Votes_CandidateId",
+                table: "Votes",
+                column: "CandidateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Votes_ElectionId",
+                table: "Votes",
+                column: "ElectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Votes_ElectorId",
+                table: "Votes",
+                column: "ElectorId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -337,7 +497,13 @@ namespace AutonomyForum.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "PrivateMessages");
+
+            migrationBuilder.DropTable(
                 name: "ReplyUser");
+
+            migrationBuilder.DropTable(
+                name: "Votes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -349,10 +515,16 @@ namespace AutonomyForum.Migrations
                 name: "Topics");
 
             migrationBuilder.DropTable(
+                name: "Sections");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Sections");
+                name: "Elections");
+
+            migrationBuilder.DropTable(
+                name: "Files");
         }
     }
 }

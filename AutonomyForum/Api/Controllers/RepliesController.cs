@@ -38,6 +38,13 @@ public class RepliesController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> DeleteReply([FromRoute] Guid id)
     {
+        if (HttpContext.Items.ContainsKey(RequirePermissionAttribute.ConditionalCheckMarker))
+        {
+            if (!await repliesService.IsPrefect(id, User.GetId()))
+            {
+                return Forbid();
+            }
+        }
         await repliesService.DeleteReply(id);
 
         return Ok();
@@ -48,6 +55,19 @@ public class RepliesController : ControllerBase
     public async Task<ActionResult> DoLikeReply([FromRoute] Guid id)
     {
         var wasLiked = await repliesService.DoLikeReply(id, User.GetId());
+        if (!wasLiked)
+        {
+            return BadRequest();
+        }
+
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("{id}/cancel-like")]
+    public async Task<ActionResult> CancelLikeReply([FromRoute] Guid id)
+    {
+        var wasLiked = await repliesService.CancelLikeReply(id, User.GetId());
         if (!wasLiked)
         {
             return BadRequest();

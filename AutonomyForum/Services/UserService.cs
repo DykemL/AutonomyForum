@@ -47,7 +47,9 @@ public class UserService
             UserName = existingUser.UserName,
             Email = existingUser.Email,
             Roles = await GetUserRoles(userId),
-            AvatarFilePath = existingUser.AvatarFile?.Path
+            AvatarFilePath = existingUser.AvatarFile?.Path,
+            RepliesCount = existingUser.RepliesCount,
+            Rating = existingUser.Rating
         };
         user.Permissions = await GetClearedPermissions(user.UserName);
 
@@ -69,7 +71,7 @@ public class UserService
     public async Task<string[]> GetClearedPermissions(string userName)
     {
         var claims = await GetPermissionClaims(userName);
-        return claims.Select(x => x.Value.Replace(PermissionPrefixes.Base + ":", string.Empty)).ToArray();
+        return claims.Select(x => x.Value.Replace(PermissionPrefixes.Base + ":", string.Empty)).Distinct().ToArray();
     }
 
     public async Task<Claim[]> GetPermissionClaims(string userName)
@@ -140,7 +142,9 @@ public class UserService
 
     private bool CheckModifyRolePermission(UserExtended currentUser, UserExtended targetUser, string role)
     {
-        if (currentUser.Roles.Contains(AppRoles.Moderator) && targetUser.Roles.Contains(AppRoles.Moderator))
+        if (currentUser.Roles.Contains(AppRoles.Moderator) && targetUser.Roles.Contains(AppRoles.Moderator) ||
+            currentUser.Roles.Contains(AppRoles.Prefect) && targetUser.Roles.Contains(AppRoles.Prefect) ||
+            currentUser.Roles.Contains(AppRoles.Prefect) && targetUser.Roles.Contains(AppRoles.Moderator))
         {
             return false;
         }
@@ -154,6 +158,7 @@ public class UserService
         {
             AppRoles.Banned => permission == Permissions.Ban,
             AppRoles.Moderator => permission == Permissions.SetModerator,
+            AppRoles.Prefect => permission == Permissions.SetPrefect,
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
 }

@@ -7,6 +7,8 @@ public class SectionInfo
     public string Title { get; set; }
     public string Description { get; set; }
     public TopicInfo[]? Topics { get; set; }
+    public UserInfo Prefect { get; set; }
+    public DateTime CreationDateTime { get; set; }
 
     public SectionInfo(Section section)
     {
@@ -15,5 +17,7 @@ public class SectionInfo
         Title = section.Title;
         Description = section.Description;
         Topics = section.Topics?.Select(x => new TopicInfo(x)).ToArray();
+        Prefect = section.Prefect != null ? new UserInfo(section.Prefect, section.Prefect?.AvatarFile?.Path) : null;
+        CreationDateTime = section.CreationDateTime;
     }
 }

@@ -5,6 +5,7 @@ public static class Permissions
     #region Common
     public const string Ban = "ban";
     public const string SetModerator = "set-moderator";
+    public const string SetPrefect = "set-prefect";
     public const string AllRestricted = "restricted";
     #endregion
 

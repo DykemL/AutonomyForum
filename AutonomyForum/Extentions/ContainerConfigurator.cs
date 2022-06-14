@@ -3,6 +3,7 @@ using AutonomyForum.Models;
 using AutonomyForum.Repositories;
 using AutonomyForum.Services;
 using AutonomyForum.Services.Auth;
+using AutonomyForum.Services.Elections;
 
 namespace AutonomyForum.Extentions;
 
@@ -12,7 +13,7 @@ public static class ContainerConfigurator
     {
         services.AddSingleton<JwtSecurityTokenHandler>();
 
-        services.AddTransient<IDbInitializer, AppDbInitializer>();
+        services.AddSingleton<IDbInitializer, AppDbInitializer>();
 
         ConfigureRepositories(services);
         ConfigureServices(services);
@@ -23,7 +24,10 @@ public static class ContainerConfigurator
                    .AddScoped<SectionsRepository>()
                    .AddScoped<TopicsRepository>()
                    .AddScoped<RepliesRepository>()
-                   .AddScoped<FilesRepository>();
+                   .AddScoped<FilesRepository>()
+                   .AddScoped<ElectionsRepository>()
+                   .AddScoped<VotesRepository>()
+                   .AddScoped<PrivateMessagesRepository>();
 
     private static void ConfigureServices(IServiceCollection services)
         => services.AddScoped<IAuthService, AuthService>()
@@ -32,5 +36,7 @@ public static class ContainerConfigurator
                    .AddScoped<SectionsService>()
                    .AddScoped<TopicsService>()
                    .AddScoped<RepliesService>()
-                   .AddScoped<FilesService>();
+                   .AddScoped<FilesService>()
+                   .AddScoped<ElectionsService>()
+                   .AddScoped<PrivateMessagesService>();
 }

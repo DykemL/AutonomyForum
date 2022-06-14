@@ -27,4 +27,10 @@ public class TopicsService
 
     public async Task DeleteTopic(Guid id)
         => await topicsRepository.DeleteTopic(id);
+
+    public async Task<bool> IsPrefect(Guid topicId, Guid userId)
+    {
+        var topic = await topicsRepository.FindTopic(topicId);
+        return topic?.Section.PrefectId == userId;
+    }
 }

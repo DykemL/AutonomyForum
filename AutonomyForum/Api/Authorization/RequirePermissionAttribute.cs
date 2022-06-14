@@ -10,6 +10,8 @@ namespace AutonomyForum.Api.Authorization;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class RequirePermissionAttribute : Attribute, IAsyncAuthorizationFilter
 {
+    public const string ConditionalCheckMarker = "IsNeedToConditionalCheck";
+
     private readonly string permission;
 
     public RequirePermissionAttribute(string permission)
@@ -30,6 +32,15 @@ public class RequirePermissionAttribute : Attribute, IAsyncAuthorizationFilter
         var permissionClaims = userClaims.Where(x => x.Type == ClaimTypes.Permission)
                                          .Select(x => x.Value)
                                          .ToHashSet();
+
+        var conditionalPermissions = permissionClaims.Where(x => x.StartsWith(PermissionPrefixes.Conditional + ":")).ToArray();
+        var hasConditionalPermission = conditionalPermissions.Contains(PermissionsGenerator.GenerateConditional(permission));
+        if (hasConditionalPermission)
+        {
+            context.HttpContext.Items.Add(ConditionalCheckMarker, true);
+            return;
+        }
+
         var basePermissions = permissionClaims.Where(x => x.StartsWith(PermissionPrefixes.Base + ":")).ToArray();
         var hasPermission = basePermissions.Contains(PermissionsGenerator.GenerateBase(permission));
         if (!hasPermission)

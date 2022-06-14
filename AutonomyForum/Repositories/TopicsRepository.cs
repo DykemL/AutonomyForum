@@ -38,11 +38,13 @@ public class TopicsRepository
     {
         var topic = await appDbContext.Topics.Where(x => x.Id == id)
                                       .Include(x => x.Author)
+                                      .ThenInclude(x => x.AvatarFile)
                                       .Include(x => x.Replies)
                                       .ThenInclude(x => x.Author)
                                       .ThenInclude(x => x.AvatarFile)
                                       .Include(x => x.Replies!.OrderBy(y => y.CreationDateTime))!
                                       .ThenInclude(x => x.FavoredBy)
+                                      .Include(x => x.Section)
                                       .FirstOrDefaultAsync();
         if (topic == null)
         {
@@ -58,9 +60,8 @@ public class TopicsRepository
 
     public async Task DeleteTopic(Guid id)
     {
-        var topic = new Topic() { Id = id };
-        appDbContext.Topics.Attach(topic);
-        appDbContext.Topics.Remove(topic);
+        var topic = await appDbContext.Topics.FirstOrDefaultAsync(x => x.Id == id);
+        appDbContext.Topics.Remove(topic!);
         await appDbContext.SaveChangesAsync();
     }
 }

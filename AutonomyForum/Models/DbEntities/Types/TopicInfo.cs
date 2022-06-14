@@ -7,6 +7,7 @@ public class TopicInfo
     public string Title { get; set; }
     public string TitleMessage { get; set; }
     public ReplyInfo[]? Replies { get; set; }
+    public Guid? PrefectId { get; set; }
     public DateTime CreationDateTime { get; set; }
 
     public TopicInfo(Topic topic)
@@ -16,6 +17,7 @@ public class TopicInfo
         Title = topic.Title;
         TitleMessage = topic.TitleMessage;
         Replies = topic.Replies?.Select(x => new ReplyInfo(x)).ToArray();
+        PrefectId = topic.Section?.PrefectId;
         CreationDateTime = topic.CreationDateTime;
     }
 }

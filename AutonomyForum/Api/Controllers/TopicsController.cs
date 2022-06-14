@@ -51,6 +51,13 @@ public class TopicsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> DeleteTopic([FromRoute] Guid id)
     {
+        if (HttpContext.Items.ContainsKey(RequirePermissionAttribute.ConditionalCheckMarker))
+        {
+            if (!await topicsService.IsPrefect(id, User.GetId()))
+            {
+                return Forbid();
+            }
+        }
         await topicsService.DeleteTopic(id);
 
         return Ok();

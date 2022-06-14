@@ -8,6 +8,13 @@ public class Section : DbEntity
     public string Title { get; set; }
     public string Description { get; set; }
     public List<Topic> Topics { get; set; }
+
+    public Guid? PrefectId { get; set; }
+    public User? Prefect { get; set; }
+
+    public Guid ElectionId { get; set; }
+    public Election Election { get; set; }
+
     public DateTime CreationDateTime { get; set; }
 
     public Section()

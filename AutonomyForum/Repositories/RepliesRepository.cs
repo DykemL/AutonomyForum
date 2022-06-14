@@ -38,13 +38,14 @@ public class RepliesRepository
 
     public async Task<Reply?> FindReply(Guid replyId)
         => await replies.Include(x => x.FavoredBy)
+                        .Include(x => x.Topic)
+                        .ThenInclude(x => x.Section)
                         .FirstOrDefaultAsync(x => x.Id == replyId);
 
     public async Task DeleteReply(Guid replyId)
     {
-        var reply = new Reply() { Id = replyId };
-        appDbContext.Replies.Attach(reply);
-        appDbContext.Replies.Remove(reply);
+        var reply = await appDbContext.Replies.FirstOrDefaultAsync(x => x.Id == replyId);
+        appDbContext.Replies.Remove(reply!);
         await appDbContext.SaveChangesAsync();
     }
 
@@ -58,6 +59,22 @@ public class RepliesRepository
         }
 
         reply.FavoredBy.Add(user);
+        appDbContext.Entry(reply).State = EntityState.Modified;
+        await appDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> CancelLikeReply(Guid replyId, Guid userId)
+    {
+        var user = await usersRepository.FindUserById(userId);
+        var reply = await FindReply(replyId);
+        if (user == null || reply == null || reply.FavoredBy.FirstOrDefault(x => x.Id == userId) == null)
+        {
+            return false;
+        }
+
+        reply.FavoredBy.Remove(user);
         appDbContext.Entry(reply).State = EntityState.Modified;
         await appDbContext.SaveChangesAsync();
 

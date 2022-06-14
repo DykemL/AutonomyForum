@@ -56,7 +56,15 @@ public class AppDbInitializer : IDbInitializer
             PermissionsGenerator.GenerateBaseClaim(Permissions.Ban),
 
             PermissionsGenerator.GenerateBaseClaim(Permissions.CreateSection),
+            PermissionsGenerator.GenerateBaseClaim(Permissions.DeleteTopic),
             PermissionsGenerator.GenerateBaseClaim(Permissions.DeleteReply)
+        });
+        await TryAddRoleAsync(AppRoles.Prefect, new[]
+        {
+            PermissionsGenerator.GenerateBaseClaim(Permissions.Ban),
+
+            PermissionsGenerator.GenerateConditionalClaim(Permissions.DeleteTopic),
+            PermissionsGenerator.GenerateConditionalClaim(Permissions.DeleteReply)
         });
     }
 

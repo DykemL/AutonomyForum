@@ -1,12 +1,10 @@
-﻿using AutonomyForum.Helpers;
-using AutonomyForum.HostedServices;
+﻿using AutonomyForum.HostedServices;
 using AutonomyForum.Models;
 using AutonomyForum.Models.DbEntities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace AutonomyForum.Extentions;
 
@@ -22,7 +20,8 @@ public static class WebApplicationBuilderExtentions
     public static void ConfigureDatabase(this WebApplicationBuilder builder, AppSettings settings)
         => builder.Services
                   .AddDbContext<AppDbContext>(options => options.UseNpgsql(settings.DatabaseConnectionString!))
-                  .AddHostedService<DbInitializerHostedService>();
+                  .AddHostedService<DbInitializerHostedService>()
+                  .AddHostedService<ElectionsHostedService>();
 
     public static void ConfigureIdentity(this WebApplicationBuilder builder)
         => builder.Services.AddIdentity<User, Role>(options =>

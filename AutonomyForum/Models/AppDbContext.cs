@@ -12,6 +12,11 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Reply> Replies { get; set; }
     public DbSet<File> Files { get; set; }
 
+    public DbSet<Election> Elections { get; set; }
+    public DbSet<Vote> Votes { get; set; }
+
+    public DbSet<PrivateMessage> PrivateMessages { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
@@ -20,6 +25,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid>
     {
         modelBuilder.Entity<User>().HasIndex(x => x.RefreshToken).IsUnique();
         ResolveManyRelations(modelBuilder);
+        ResolveOneToOneRelations(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }
@@ -32,5 +38,16 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid>
 
         modelBuilder.Entity<Reply>().HasOne(x => x.Author)
                     .WithMany();
+    }
+
+    private void ResolveOneToOneRelations(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Section>().HasOne(x => x.Election)
+                    .WithOne(x => x.Section)
+                    .HasForeignKey<Election>(x => x.SectionId);
+
+        modelBuilder.Entity<Election>().HasOne(x => x.Section)
+                    .WithOne(x => x.Election)
+                    .HasForeignKey<Section>(x => x.ElectionId);
     }
 }

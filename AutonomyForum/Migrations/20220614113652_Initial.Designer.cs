@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AutonomyForum.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220524051310_Initial")]
+    [Migration("20220614113652_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,76 @@ namespace AutonomyForum.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Election", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CurrentRoundNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LastStatusModifiedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Elections");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.File", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.PrivateMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("PrivateMessages");
+                });
 
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.Reply", b =>
                 {
@@ -92,6 +162,12 @@ namespace AutonomyForum.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("ElectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PrefectId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -100,6 +176,11 @@ namespace AutonomyForum.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ElectionId")
+                        .IsUnique();
+
+                    b.HasIndex("PrefectId");
 
                     b.ToTable("Sections");
                 });
@@ -145,9 +226,15 @@ namespace AutonomyForum.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("AvatarFileId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("ElectionId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -179,8 +266,14 @@ namespace AutonomyForum.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text");
+
+                    b.Property<int>("RepliesCount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -194,6 +287,10 @@ namespace AutonomyForum.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvatarFileId");
+
+                    b.HasIndex("ElectionId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -205,6 +302,32 @@ namespace AutonomyForum.Migrations
                         .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Vote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ElectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ElectorId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("ElectionId");
+
+                    b.HasIndex("ElectorId");
+
+                    b.ToTable("Votes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -325,6 +448,25 @@ namespace AutonomyForum.Migrations
                     b.ToTable("ReplyUser");
                 });
 
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.PrivateMessage", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.Reply", b =>
                 {
                     b.HasOne("AutonomyForum.Models.DbEntities.User", "Author")
@@ -344,6 +486,23 @@ namespace AutonomyForum.Migrations
                     b.Navigation("Topic");
                 });
 
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Section", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.Election", "Election")
+                        .WithOne("Section")
+                        .HasForeignKey("AutonomyForum.Models.DbEntities.Section", "ElectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Prefect")
+                        .WithMany()
+                        .HasForeignKey("PrefectId");
+
+                    b.Navigation("Election");
+
+                    b.Navigation("Prefect");
+                });
+
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.Topic", b =>
                 {
                     b.HasOne("AutonomyForum.Models.DbEntities.User", "Author")
@@ -361,6 +520,48 @@ namespace AutonomyForum.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Section");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.User", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.File", "AvatarFile")
+                        .WithMany()
+                        .HasForeignKey("AvatarFileId");
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.Election", "Election")
+                        .WithMany("Candidates")
+                        .HasForeignKey("ElectionId");
+
+                    b.Navigation("AvatarFile");
+
+                    b.Navigation("Election");
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Vote", b =>
+                {
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.Election", "Election")
+                        .WithMany("Votes")
+                        .HasForeignKey("ElectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutonomyForum.Models.DbEntities.User", "Elector")
+                        .WithMany()
+                        .HasForeignKey("ElectorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Election");
+
+                    b.Navigation("Elector");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -427,6 +628,16 @@ namespace AutonomyForum.Migrations
                         .HasForeignKey("FavoredRepliesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AutonomyForum.Models.DbEntities.Election", b =>
+                {
+                    b.Navigation("Candidates");
+
+                    b.Navigation("Section")
+                        .IsRequired();
+
+                    b.Navigation("Votes");
                 });
 
             modelBuilder.Entity("AutonomyForum.Models.DbEntities.Section", b =>
